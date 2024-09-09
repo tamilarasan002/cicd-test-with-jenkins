@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: helloworld-container
-        image: 192.168.4.81:5000/helloworld:${BUILD_NUMBER}
+        image: 192.168.4.81:5000/helloworld:v1
         ports:
         - containerPort: 8080
 ---
