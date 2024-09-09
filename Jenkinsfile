@@ -5,7 +5,6 @@ pipeline {
         // Define environment variables
         REGISTRY = "192.168.4.81:5000"
         IMAGE_NAME = "helloworld"
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
         KUBECONFIG = credentials('config') // Kubernetes credentials
     }
     
@@ -19,6 +18,10 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    // Dynamically set the IMAGE_TAG in the Build stage
+                    IMAGE_TAG = "${env.BUILD_NUMBER}"
+                    
+                    // Build the Maven project
                     sh 'mvn clean package'
                 }
             }
@@ -27,7 +30,10 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
+                    // Build Docker image
                     docker.build("${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
+                    
+                    // Push Docker image to private registry
                     docker.withRegistry("http://${REGISTRY}", 'dockerhub-credentials') {
                         docker.image("${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}").push("${IMAGE_TAG}")
                     }
@@ -38,6 +44,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
+                    // Deploy to Kubernetes using kubectl
                     kubectlApply("deploy.yaml")
                 }
             }
@@ -54,6 +61,10 @@ pipeline {
     }
 }
 
+// Function to apply Kubernetes manifests
 def kubectlApply(file) {
-    sh "kubectl apply -f ${file} --kubeconfig=${env.KUBECONFIG}"
+    sh """
+    set -e
+    kubectl apply -f ${file} --kubeconfig=${env.KUBECONFIG}
+    """
 }
