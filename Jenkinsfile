@@ -5,13 +5,14 @@ pipeline {
         // Define environment variables
         REGISTRY = "192.168.4.81:5000"
         IMAGE_NAME = "helloworld"
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
         KUBECONFIG = credentials('config') // Kubernetes credentials
     }
     
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Tamilarasand02/cicd-test-with-jenkins.git'
+                git branch: 'main', url: 'https://github.com/Tamilarasand02/cicd-test-with-jenkins.git'
             }
         }
         
@@ -61,7 +62,6 @@ pipeline {
     }
 }
 
-// Function to apply Kubernetes manifests
 def kubectlApply(file) {
     sh """
     set -e
