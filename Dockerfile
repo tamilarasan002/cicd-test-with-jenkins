@@ -9,7 +9,7 @@ ENV CATALINA_HOME /usr/share/tomcat
 ENV CATALINA_BASE /usr/share/tomcat
 
 # Copy the WAR file to the Tomcat webapps directory
-COPY target/hello-world-app.war $CATALINA_HOME/webapps/
+COPY target/hello-world-app-1.0-SNAPSHOT.war $CATALINA_HOME/webapps/
 
 # Expose port 8080 for Tomcat
 EXPOSE 8080
