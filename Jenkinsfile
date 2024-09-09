@@ -5,7 +5,7 @@ pipeline {
         // Define environment variables
         REGISTRY = "192.168.4.81:5000"
         IMAGE_NAME = "helloworld"
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        IMAGE_TAG = "v1"
         KUBECONFIG = credentials('81conf') // Kubernetes credentials
     }
     
@@ -20,7 +20,7 @@ pipeline {
             steps {
                 script {
                     // Dynamically set the IMAGE_TAG in the Build stage
-                    IMAGE_TAG = "${env.BUILD_NUMBER}"
+                    IMAGE_TAG = "${IMAGE_TAG}"
                     
                     // Build the Maven project
                     sh 'mvn clean package'
