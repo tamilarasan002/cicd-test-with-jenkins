@@ -6,7 +6,7 @@ pipeline {
         REGISTRY = "192.168.4.81:5000"
         IMAGE_NAME = "helloworld"
         IMAGE_TAG = "${env.BUILD_NUMBER}"
-        KUBECONFIG = credentials('admin_conf') // Kubernetes credentials
+        KUBECONFIG = credentials('81conf') // Kubernetes credentials
     }
     
     stages {
