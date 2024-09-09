@@ -35,7 +35,7 @@ pipeline {
                     docker.build("${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
                     
                     // Push Docker image to private registry
-                    docker.withRegistry("http://${REGISTRY}", 'dockerhub-credentials') {
+                    docker.withRegistry("http://${REGISTRY} {
                         docker.image("${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}").push("${IMAGE_TAG}")
                     }
                 }
