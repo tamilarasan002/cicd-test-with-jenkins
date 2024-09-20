@@ -2,23 +2,12 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'ACTION', choices: ['Docker', 'Kubernetes'], description: 'Select the action to perform')
+        choice(name: 'ACTION', choices: ['Docker', 'Kubernetes', 'Both'], description: 'Select the action to perform')
         string(name: 'REGISTRY', defaultValue: '192.168.4.81:5000', description: 'Docker registry URL')
         string(name: 'IMAGE_NAME', defaultValue: 'helloworld', description: 'Name of the Docker image')
         string(name: 'IMAGE_TAG', defaultValue: "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}", description: 'Tag for the Docker image')
-
-        // Active Choice Parameter for Kubernetes
-        activeChoice(name: 'KUBE_CONFIG', description: 'Kubernetes credentials ID', 
-                     choices: ['81conf', 'another-credential'].collect { it },
-                     filterable: true).when {
-            expression { params.ACTION == 'Kubernetes' }
-        }
-
-        activeChoice(name: 'DEPLOYMENT_FILE', description: 'Kubernetes deployment file path', 
-                     choices: ['deploy.yaml', 'another-file.yaml'].collect { it },
-                     filterable: true).when {
-            expression { params.ACTION == 'Kubernetes' }
-        }
+        string(name: 'KUBE_CONFIG', defaultValue: '81conf', description: 'Kubernetes credentials ID')
+        string(name: 'DEPLOYMENT_FILE', defaultValue: 'deploy.yaml', description: 'Kubernetes deployment file path')
     }
 
     stages {
@@ -39,11 +28,11 @@ pipeline {
 
         stage('Docker Build & Push') {
             when {
-                expression { params.ACTION == 'Docker' }
+                expression { params.ACTION == 'Docker' || params.ACTION == 'Both' }
             }
             steps {
                 script {
-                    // Build Docker image
+                    // Build Docker image with provided tag
                     docker.build("${params.REGISTRY}/${params.IMAGE_NAME}:${params.IMAGE_TAG}")
 
                     // Push Docker image to private registry
@@ -56,7 +45,7 @@ pipeline {
 
         stage('Update Kubernetes Manifests') {
             when {
-                expression { params.ACTION == 'Kubernetes' }
+                expression { params.ACTION == 'Kubernetes' || params.ACTION == 'Both' }
             }
             steps {
                 script {
@@ -70,7 +59,7 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             when {
-                expression { params.ACTION == 'Kubernetes' }
+                expression { params.ACTION == 'Kubernetes' || params.ACTION == 'Both' }
             }
             steps {
                 script {
