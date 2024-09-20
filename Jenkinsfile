@@ -2,12 +2,18 @@ pipeline {
     agent any
 
     parameters {
-        choice(name: 'ACTION', choices: ['Docker', 'Kubernetes', 'Both'], description: 'Select the action to perform')
+        choice(name: 'ACTION', choices: ['Docker', 'Kubernetes'], description: 'Select the action to perform')
         string(name: 'REGISTRY', defaultValue: '192.168.4.81:5000', description: 'Docker registry URL')
         string(name: 'IMAGE_NAME', defaultValue: 'helloworld', description: 'Name of the Docker image')
         string(name: 'IMAGE_TAG', defaultValue: "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}", description: 'Tag for the Docker image')
-        string(name: 'KUBE_CONFIG', defaultValue: '81conf', description: 'Kubernetes credentials ID')
-        string(name: 'DEPLOYMENT_FILE', defaultValue: 'deploy.yaml', description: 'Kubernetes deployment file path')
+
+        // Additional parameters for Kubernetes
+        string(name: 'KUBE_CONFIG', defaultValue: '81conf', description: 'Kubernetes credentials ID').when {
+            expression { params.ACTION == 'Kubernetes' }
+        }
+        string(name: 'DEPLOYMENT_FILE', defaultValue: 'deploy.yaml', description: 'Kubernetes deployment file path').when {
+            expression { params.ACTION == 'Kubernetes' }
+        }
     }
 
     stages {
@@ -16,7 +22,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Tamilarasand02/cicd-test-with-jenkins.git'
             }
         }
-        
+
         stage('Build') {
             steps {
                 script {
@@ -26,10 +32,9 @@ pipeline {
             }
         }
 
-        // Conditional stage for Docker actions
         stage('Docker Build & Push') {
             when {
-                expression { params.ACTION == 'Docker' || params.ACTION == 'Both' }
+                expression { params.ACTION == 'Docker' }
             }
             steps {
                 script {
@@ -44,10 +49,9 @@ pipeline {
             }
         }
 
-        // Conditional stage for Kubernetes actions
         stage('Update Kubernetes Manifests') {
             when {
-                expression { params.ACTION == 'Kubernetes' || params.ACTION == 'Both' }
+                expression { params.ACTION == 'Kubernetes' }
             }
             steps {
                 script {
@@ -59,10 +63,9 @@ pipeline {
             }
         }
 
-        // Conditional stage for deploying to Kubernetes
         stage('Deploy to Kubernetes') {
             when {
-                expression { params.ACTION == 'Kubernetes' || params.ACTION == 'Both' }
+                expression { params.ACTION == 'Kubernetes' }
             }
             steps {
                 script {
