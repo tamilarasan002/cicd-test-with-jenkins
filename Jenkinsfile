@@ -46,7 +46,7 @@ pipeline {
             steps {
                 script {
                     // Deploy to Kubernetes using kubectl
-                    kubectlApply("deploy.yaml")
+                    sh "kubectl --kubeconfig=$KUBE_CONFIG create -f $WORKSPACE/deploy.yaml.yaml"
                 }
             }
         }
