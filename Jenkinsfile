@@ -7,11 +7,16 @@ pipeline {
         string(name: 'IMAGE_NAME', defaultValue: 'helloworld', description: 'Name of the Docker image')
         string(name: 'IMAGE_TAG', defaultValue: "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}", description: 'Tag for the Docker image')
 
-        // Additional parameters for Kubernetes
-        string(name: 'KUBE_CONFIG', defaultValue: '81conf', description: 'Kubernetes credentials ID').when {
+        // Active Choice Parameter for Kubernetes
+        activeChoice(name: 'KUBE_CONFIG', description: 'Kubernetes credentials ID', 
+                     choices: ['81conf', 'another-credential'].collect { it },
+                     filterable: true).when {
             expression { params.ACTION == 'Kubernetes' }
         }
-        string(name: 'DEPLOYMENT_FILE', defaultValue: 'deploy.yaml', description: 'Kubernetes deployment file path').when {
+
+        activeChoice(name: 'DEPLOYMENT_FILE', description: 'Kubernetes deployment file path', 
+                     choices: ['deploy.yaml', 'another-file.yaml'].collect { it },
+                     filterable: true).when {
             expression { params.ACTION == 'Kubernetes' }
         }
     }
@@ -38,7 +43,7 @@ pipeline {
             }
             steps {
                 script {
-                    // Build Docker image with provided tag
+                    // Build Docker image
                     docker.build("${params.REGISTRY}/${params.IMAGE_NAME}:${params.IMAGE_TAG}")
 
                     // Push Docker image to private registry
