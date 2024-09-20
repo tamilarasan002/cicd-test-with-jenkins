@@ -19,9 +19,6 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Dynamically set the IMAGE_TAG in the Build stage
-                    IMAGE_TAG = "${IMAGE_TAG}"
-                    
                     // Build the Maven project
                     sh 'mvn clean package'
                 }
@@ -35,7 +32,7 @@ pipeline {
                     docker.build("${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
                     
                     // Push Docker image to private registry
-                    docker.withRegistry("http://${REGISTRY} "){
+                    docker.withRegistry("http://${REGISTRY}") {
                         docker.image("${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}").push("${IMAGE_TAG}")
                     }
                 }
@@ -46,7 +43,7 @@ pipeline {
             steps {
                 script {
                     // Deploy to Kubernetes using kubectl
-                    sh "kubectl --kubeconfig=$KUBE_CONFIG create -f $WORKSPACE/deploy.yaml.yaml"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f ${WORKSPACE}/deploy.yaml"
                 }
             }
         }
@@ -60,11 +57,4 @@ pipeline {
             echo "Build or deployment failed."
         }
     }
-}
-
-def kubectlApply(file) {
-    sh """
-    set -e
-    kubectl apply -f ${file} --kubeconfig=${env.KUBECONFIG}
-    """
 }
