@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    parameters {
+        string(name: 'DEPLOYMENT_FILE', defaultValue: 'path/to/your/deployment.yaml', description: 'Path to the Kubernetes deployment YAML file')
+    }
+
     environment {
         REGISTRY = "192.168.4.81:5000"
         IMAGE_NAME = "helloworld"
@@ -42,7 +46,7 @@ pipeline {
                 script {
                     // Update the image tag in Kubernetes deployment YAML
                     sh """
-                    sed -i 's|image: .*|image: ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}|g' $WORKSPACE/${params.DEPLOYMENT_FILE}
+                    sed -i 's|image: .*|image: ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}|g' $WORKSPACE/${DEPLOYMENT_FILE}
                     """
                 }
             }
@@ -52,7 +56,7 @@ pipeline {
             steps {
                 script {
                     // Apply the updated YAML file to deploy the new image version
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f $WORKSPACE/${params.DEPLOYMENT_FILE}"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f $WORKSPACE/${DEPLOYMENT_FILE}"
                 }
             }
         }
