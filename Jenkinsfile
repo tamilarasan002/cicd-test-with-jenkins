@@ -1,9 +1,6 @@
 pipeline {
     agent any
 
-    parameters {
-        string(name: 'DEPLOYMENT_FILE', defaultValue: 'path/to/your/deployment.yaml', description: 'Path to the Kubernetes deployment YAML file')
-    }
 
     environment {
         REGISTRY = "192.168.4.81:5000"
