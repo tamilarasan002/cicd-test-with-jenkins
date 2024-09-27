@@ -1,13 +1,13 @@
 pipeline {
     agent any
 
-    parameters {
-        choice(name: 'ACTION', choices: ['Docker', 'Kubernetes', 'Both'], description: 'Select the action to perform')
-        string(name: 'REGISTRY', defaultValue: '192.168.4.81:5000', description: 'Docker registry URL')
-        string(name: 'IMAGE_NAME', defaultValue: 'helloworld', description: 'Name of the Docker image')
-        string(name: 'IMAGE_TAG', defaultValue: "${env.BUILD_NUMBER}-${env.GIT_COMMIT.substring(0, 7)}", description: 'Tag for the Docker image')
-        string(name: 'KUBE_CONFIG', defaultValue: '81conf', description: 'Kubernetes credentials ID')
-        string(name: 'DEPLOYMENT_FILE', defaultValue: 'deploy.yaml', description: 'Kubernetes deployment file path')
+    environment {
+        // Define environment variables
+        REGISTRY = "192.168.4.81:5000"
+        IMAGE_NAME = "helloworld"
+        IMAGE_TAG = "${env.BUILD_NUMBER}"
+        IMAGE_TAG = "v1"
+        KUBECONFIG = credentials('kubeconfig') // Kubernetes credentials
     }
 
     stages {
