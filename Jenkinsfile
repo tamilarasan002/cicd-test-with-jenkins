@@ -41,16 +41,6 @@ pipeline {
             }
         }
 
-        stage('Update Kubernetes Manifests') {
-            steps {
-                script {
-                    // Update the image tag in Kubernetes deployment YAML
-                    sh """
-                    sed -i 's|image: .*|image: ${REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}|g' $WORKSPACE/${DEPLOYMENT_FILE}
-                    """
-                }
-            }
-        }
 
         stage('Deploy to Kubernetes') {
             steps {
