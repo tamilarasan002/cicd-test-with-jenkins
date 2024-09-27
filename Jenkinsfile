@@ -5,7 +5,6 @@ pipeline {
         // Define environment variables
         REGISTRY = "192.168.4.81:5000"
         IMAGE_NAME = "helloworld"
-        IMAGE_TAG = "${env.BUILD_NUMBER}"
         IMAGE_TAG = "v1"
         KUBECONFIG = credentials('kubeconfig') // Kubernetes credentials
     }
