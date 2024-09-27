@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     // Apply the updated YAML file to deploy the new image version
-                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f $WORKSPACE/${DEPLOYMENT_FILE}"
+                    sh "kubectl --kubeconfig=${KUBECONFIG} apply -f $WORKSPACE/deploy.yaml"
                 }
             }
         }
