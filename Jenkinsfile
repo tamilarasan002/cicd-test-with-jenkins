@@ -1,7 +1,6 @@
 pipeline {
     agent any
 
-
     environment {
         REGISTRY = "192.168.4.81:5000"
         IMAGE_NAME = "helloworld"
